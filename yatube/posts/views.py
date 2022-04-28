@@ -52,7 +52,7 @@ def profile(request, username):
     """Model and the creation of the context dict for user."""
     template = PATH_TO_PROFILE
     author = get_object_or_404(User, username=username)
-    post_list = author.posts.all().order_by("-pub_date")
+    post_list = author.posts.select_related('group', 'author').all()
     context = {
         'author': author,
         'posts_count': author.posts.count(),
