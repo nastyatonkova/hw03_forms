@@ -10,21 +10,11 @@ class PostForm(forms.ModelForm):
         fields = ('group', 'text',)
 
         labels = {
-            'group': ('Группа'),
-            'text': ('Текст'),
+            'group': 'Группа',
+            'text': 'Текст',
         }
 
         help_texts = {
-            'group': ('Выберите группу для новой записи'),
-            'text': ('Добавьте текст для новой записи'),
+            'group': 'Выберите группу для новой записи',
+            'text': 'Добавьте текст для новой записи',
         }
-
-
-"""
-    def clean_text(self):
-        comment = self.cleaned_data['text']
-        if not comment:
-            raise forms.ValidationError(
-                "Нельзя добавить пустой комментарий")
-        return comment
-."""

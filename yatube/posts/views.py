@@ -7,8 +7,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from .forms import PostForm
 from .models import Group, Post, User
 
-# from django.contrib.auth.models import User
-
 
 PATH_TO_INDEX = os.path.join('posts', 'index.html')
 PATH_TO_GROUP_LIST = os.path.join('posts', 'group_list.html')
@@ -18,61 +16,53 @@ PATH_TO_CREATE_POST = os.path.join('posts', 'create_post.html')
 POSTS_IN_PAGINATOR = 10
 
 
-def index(request):
-    """Return main page."""
-    template = PATH_TO_INDEX
-    # title = 'Main page for project Yatube'
-    post_list = Post.objects.select_related(
-        'group').all().order_by('-pub_date')
+def page_maker(post_list, request):
+    """Return paginator."""
     paginator = Paginator(post_list, POSTS_IN_PAGINATOR)
-
-    # Из URL извлекаем номер запрошенной страницы - это значение параметра page
     page_number = request.GET.get('page')
+    return paginator.get_page(page_number)
 
-    # Получаем набор записей для страницы с запрошенным номером
-    page_obj = paginator.get_page(page_number)
-    # Отдаем в словаре контекста
+
+def index(request):
+    """Returns main page."""
+    template = PATH_TO_INDEX
+    post_list = Post.objects.select_related(
+        'group', 'author').all()
+    title = 'Main page for project Yatube'
     context = {
-        'page_obj': page_obj,
+        'title': title,
+        'page_obj': page_maker(request=request, post_list=post_list),
     }
     return render(request, template, context)
 
 
 def group_posts(request, slug):
-    """View-function for group page."""
+    """Returns group page."""
     template = PATH_TO_GROUP_LIST
     group = get_object_or_404(Group, slug=slug)
-    posts = group.posts.select_related('group').all()
-    paginator = Paginator(posts, POSTS_IN_PAGINATOR)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-
+    post_list = group.posts.select_related('group', 'author').all()
     context = {
         'group': group,
-        'posts': posts,
-        'page_obj': page_obj,
+        'page_obj': page_maker(request=request, post_list=post_list)
     }
     return render(request, template, context)
 
 
 def profile(request, username):
-    """Code to the model and the creation of the context dict for user."""
+    """Model and the creation of the context dict for user."""
     template = PATH_TO_PROFILE
     author = get_object_or_404(User, username=username)
-    posts = author.posts.all().order_by("-pub_date")
-    paginator = Paginator(posts, POSTS_IN_PAGINATOR)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    post_list = author.posts.all().order_by("-pub_date")
     context = {
-        'page_obj': page_obj,
         'author': author,
         'posts_count': author.posts.count(),
+        'page_obj': page_maker(request=request, post_list=post_list)
     }
     return render(request, template, context)
 
 
 def post_detail(request, post_id):
-    """Code to the model and the creation of the context dict for posts."""
+    """Model and the creation of the context dict for posts."""
     template = PATH_TO_POST
     post = get_object_or_404(Post, pk=post_id)
     author = post.author
@@ -102,20 +92,14 @@ def post_create(request):
 
 @login_required
 def post_edit(request, post_id):
-    groups = Group.objects.all()
+    # groups = Group.objects.all()
     template = PATH_TO_CREATE_POST
     required_post = Post.objects.get(pk=post_id)
-    is_edit: bool = True
-    if required_post.author == request.user:
-        form = PostForm(request.POST or None, instance=required_post)
-        if form.is_valid():
-            form.save()
-            return redirect('posts:post_detail', post_id=post_id)
-        context = {
-            'form': form,
-            'groups': groups,
-            'is_edit': is_edit,
-        }
-        return render(request, template, context)
-    else:
+    if required_post.author != request.user:
         return redirect('posts:post_detail', post_id=post_id)
+    form = PostForm(request.POST or None, instance=required_post)
+    if form.is_valid():
+        form.save()
+        return redirect('posts:post_detail', post_id=post_id)
+    context = {'form': form, 'is_edit': True}
+    return render(request, template, context)

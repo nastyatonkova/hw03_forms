@@ -25,16 +25,12 @@
     </title>
   </head>
   <body>
-    <header>
-      {% include 'includes/header.html' %}
-    </header>
-    <main> 
-      {% block content %}
-        Here should be content
-      {% endblock %}
-    </main>      
-    <footer>
-      {% include 'includes/footer.html' %}
-    </footer>
+    {% include 'includes/header.html' %}
+      <main> 
+        {% block content %}
+          Here should be content
+        {% endblock %}
+      </main>      
+    {% include 'includes/footer.html' %}
   </body>
 </html>

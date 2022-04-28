@@ -1,11 +1,10 @@
 from django.core.exceptions import ValidationError
 
 
-# Функция-валидатор:
 def validate_not_empty(value):
-    # Проверка "а заполнено ли поле?"
+    """Проверка о заполнении поля."""
     if value == '':
         raise ValidationError(
-            'А кто поле будет заполнять, Пушкин?',
+            'Заполните, пожалуйста, это поле',
             params={'value': value},
         )

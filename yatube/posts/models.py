@@ -7,6 +7,7 @@ User = get_user_model()
 
 
 class Post(models.Model):
+    """ Class for creating posts."""
     text = models.TextField(validators=[validate_not_empty])
     pub_date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(
@@ -30,6 +31,7 @@ class Post(models.Model):
 
 
 class Group(models.Model):
+    """Class for creating groups."""
     title = models.CharField(max_length=200)
     slug = models.SlugField(unique=True)
     description = models.TextField()

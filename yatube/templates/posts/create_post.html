@@ -10,6 +10,7 @@
           {% if is_edit %}Редактировать запись{% else %}Новая запись{% endif %}
         </div>
         <div class="card-body">
+          {{ text }}
           {% if form.errors %}
             {% for field in form %}
               {% for error in field.errors %}            
@@ -25,8 +26,7 @@
             {% endfor %}
           {% endif %}
 
-          <form  method="post">
-
+          <form  method="post">  
             {% csrf_token %}
 
             {% for field in form %}
