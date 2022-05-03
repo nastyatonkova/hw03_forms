@@ -8,7 +8,10 @@ User = get_user_model()
 
 class Post(models.Model):
     """ Class for creating posts."""
-    text = models.TextField(validators=[validate_not_empty])
+    text = models.TextField(
+        'Текст поста',
+        help_text='Введите текст поста',
+        validators=[validate_not_empty])
     pub_date = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(
         User,
@@ -21,6 +24,8 @@ class Post(models.Model):
         blank=True,
         related_name='posts',
         on_delete=models.SET_NULL,
+        verbose_name='Группа',
+        help_text='Группа, к которой будет относиться пост',
     )
 
     def __str__(self):

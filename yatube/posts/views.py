@@ -1,5 +1,6 @@
 import os
 
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
@@ -13,12 +14,11 @@ PATH_TO_GROUP_LIST = os.path.join('posts', 'group_list.html')
 PATH_TO_PROFILE = os.path.join('posts', 'profile.html')
 PATH_TO_POST = os.path.join('posts', 'post_detail.html')
 PATH_TO_CREATE_POST = os.path.join('posts', 'create_post.html')
-POSTS_IN_PAGINATOR = 10
 
 
 def page_maker(post_list, request):
     """Return paginator."""
-    paginator = Paginator(post_list, POSTS_IN_PAGINATOR)
+    paginator = Paginator(post_list, settings.POSTS_IN_PAGINATOR)
     page_number = request.GET.get('page')
     return paginator.get_page(page_number)
 
@@ -101,5 +101,5 @@ def post_edit(request, post_id):
     if form.is_valid():
         form.save()
         return redirect('posts:post_detail', post_id=post_id)
-    context = {'form': form, 'is_edit': True}
+    context = {'form': form, 'required_post': required_post, 'is_edit': True}
     return render(request, template, context)
